@@ -32,4 +32,7 @@
            (set d d_)
            (set nearest y)))))
    nearest)
+
+ ;; Expose all entities, but just for th REPL
+ :entities entities
  }

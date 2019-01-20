@@ -1,20 +1,11 @@
 (local vec (require :lib.hump.vector))
-(local timer (require :lib.hump.timer))
 
 (local draw-entity (require :draw))
 (local update-entity (require :update))
 (local enemy (require :enemy))
 (local tower (require :tower))
 
-(local main-tower
-       {:type :tower
-        :pos (vec 250 100)
-        :life 100
-        :angle 0
-        :shell-dist 170 
-        :fire-every 2})
-
-(ents.new main-tower)
+(local main-tower (tower.spawn))
 
 (enemy.spawn 100)
 (tower.signal main-tower 100)

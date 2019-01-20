@@ -1,5 +1,7 @@
 (local repl (require "lib.stdio"))
 
+(global timer (require :lib.hump.timer))
+
 (global util (require :util))
 (global ents (require :entities))
 
