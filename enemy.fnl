@@ -21,6 +21,6 @@
     :moves true
     :pos (vec x 2)
     :velocity (vec 0 1)
-    :speed 20
+    :speed 40
     :life 100}))
  }
