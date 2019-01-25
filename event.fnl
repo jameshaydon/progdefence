@@ -1,3 +1,4 @@
+;; foo
 (fn matches [x pat]
   (if (= pat :*)
       true
