@@ -4,8 +4,8 @@
 (local draw (require :draw))
 (local events (require :event))
 
-(local ecs (e.new))
 (local subs (events.new))
+(local ecs (e.new subs))
 
 (local draw-sys
        {:filter (fn [x] x.pos)
@@ -21,16 +21,32 @@
 
 (local tower-sys
        {:filter (fn [x] x.tower)
-        :update (fn [x dt] nil)})
+        :update (fn [x dt] nil)
+        :towers {}})
 
-(events.subscribe subs [:keypressed :*]
-                  (fn [[_ key]]
-                    (print "yay" key)))
+(events.subscribe subs :entity-added
+                  (fn [e]
+                    (when (= e.type :tower)
+                      (tset tower-sys.towers e.id e)
+                      (when e.tower.focus
+                        (tset tower-sys :focused e)))))
 
-;; (fn tower-move-canon [dir]
-;;   (match dir
-;;     :left _
-;;     :right _))
+(local arrows {:up true :down true :left true :right true})
+
+(events.subscribe subs :keypressed
+                  (fn [key]
+                    (when (. arrows key)
+                      (events.emit subs :arrow-keypressed key))))
+
+(fn tower-move [t dir]
+  (match dir
+    :up (tset t.pos :y (- t.pos.y 1))
+    :down nil))
+
+(events.subscribe subs :arrow-keypressed
+                 (fn [key]
+                   (when tower-sys.focused
+                     (tower-move tower-sys.focused key))))
 
 (e.add-entity
  ecs
@@ -57,5 +73,6 @@
 
  :keypressed
  (fn keypressed [key set-mode]
-   (events.emit subs [:keypressed key]))
+   (print "cb:" key)
+   (events.emit subs :keypressed key))
  }
