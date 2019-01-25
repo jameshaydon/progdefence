@@ -5,14 +5,6 @@
      (set i (+ i 1))
      i))
 
- :move
- ;; Moves any entity that has a position, speed and a velocity.
- (fn [dt x]
-   (tset x :pos
-         (+ x.pos
-            (* x.speed
-               (* dt x.velocity)))))
-
  :rect
  (fn [x y w l]
    (love.graphics.rectangle "fill" x y w l))

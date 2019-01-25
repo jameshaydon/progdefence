@@ -1,13 +1,8 @@
-(local enemy (require :enemy))
-(local missile (require :missile))
-(local tower (require :tower))
+(fn rec [e styl w h]
+  (love.graphics.rectangle styl e.pos.x e.pos.y w h))
 
-(local drawers
-       {:tower tower.draw
-        :enemy enemy.draw
-        :missile missile.draw})
-
-(fn entity [e]
-  ((. drawers (. e :type)) e))
-
-{:entity entity}
+{:draw
+ (fn [x]
+   (match x.type
+     :enemy (rec x "fill" 100 100)
+     :tower (rec x "line" 100 100)))}

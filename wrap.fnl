@@ -3,7 +3,6 @@
 (global timer (require :lib.hump.timer))
 
 (global util (require :util))
-(global ents (require :entities))
 
 (global HEIGHT 450)
 (global WIDTH 720)
@@ -38,9 +37,7 @@
 
 (fn love.keypressed [key]
     (if
-     (= key "q") (love.event.quit)
-     
-     ;; add what each keypress should do in each mode
-     ;;(mode.keypressed key set-mode)
+     (= key "escape") (love.event.quit)
+     (mode.keypressed key set-mode)
      ))
     

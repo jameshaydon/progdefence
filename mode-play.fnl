@@ -1,41 +1,61 @@
-(local vec (require :lib.hump.vector))
+(local v (require :lib.hump.vector))
 
-(local draw-entity (require :draw))
-(local update-entity (require :update))
-(local enemy (require :enemy))
-(local tower (require :tower))
+(local e (require :entity))
+(local draw (require :draw))
+(local events (require :event))
 
-(local main-tower (tower.spawn))
+(local ecs (e.new))
+(local subs (events.new))
 
-(enemy.spawn 100)
-(tower.signal main-tower 100)
+(local draw-sys
+       {:filter (fn [x] x.pos)
+        :update draw.draw})
 
-(timer.every 20
-             (fn []
-               (enemy.spawn 100)
-               (tower.signal main-tower 100)))
-(timer.after 10
-             (fn []
-               (enemy.spawn 400)
-               (tower.signal main-tower 400)
-               (timer.every 20 (fn [] (enemy.spawn 400)
-                                 (tower.signal main-tower 400)))))
+(local move-sys
+       {:filter (fn [x] x.move)
+        :update (fn [x dt]
+                  (tset x :pos
+                        (+ x.pos
+                           (* x.move.speed
+                              (* dt x.move.velocity)))))})
 
-(timer.every main-tower.fire-every
-             (fn []
-               (tower.shoot main-tower)))
+(local tower-sys
+       {:filter (fn [x] x.tower)
+        :update (fn [x dt] nil)})
+
+(events.subscribe subs [:keypressed :*]
+                  (fn [[_ key]]
+                    (print "yay" key)))
+
+;; (fn tower-move-canon [dir]
+;;   (match dir
+;;     :left _
+;;     :right _))
+
+(e.add-entity
+ ecs
+ {:type :enemy
+  :pos (v 10 10)
+  :move {:speed 40
+         :velocity (v 1 1)}})
+
+(e.add-entity
+ ecs
+ {:pos (v 100 100)
+  :type :tower
+  :tower {:canon-angle 0
+          :focus true}})
 
 {:draw
  (fn draw [message]
-   (ents.every (fn [id x] (draw-entity.entity x))))
+   (e.run-system ecs draw-sys))
  
  :update
  (fn update [dt set-mode]
-   (timer.update dt)
-   (ents.every (fn [id x] (update-entity dt id x))))
+   (e.run-system ecs move-sys dt)
+   (e.run-system ecs tower-sys dt))
 
- ;; :keypressed
- ;; (fn keypressed [key set-mode]
- ;;   (if (= key "space")
- ;;      (tower.shoot main-tower)))
+ :keypressed
+ (fn keypressed [key set-mode]
+   (events.emit subs [:keypressed key]))
  }
